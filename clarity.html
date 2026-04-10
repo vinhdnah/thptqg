@@ -1,0 +1,2325 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clarity Planner - Mục Tiêu Tháng & Tuần</title>
+    <meta name="description"
+        content="Clarity - Ứng dụng lập kế hoạch tháng và tuần, theo dõi thói quen và mục tiêu cá nhân.">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Patrick+Hand&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg-main: #f5ebe0;
+            --bg-warm: #fae1c8;
+            --bg-peach: #f4c2a1;
+            --bg-cream: #fff8f0;
+            --bg-yellow: #fde9a9;
+            --bg-yellow-light: #fff5d6;
+            --bg-blue: #b8d4e3;
+            --bg-blue-light: #d6e8f0;
+            --bg-green: #c5d8a4;
+            --bg-pink: #f8d0cb;
+            --bg-pink-light: #fce4e0;
+            --text-dark: #5a4a3a;
+            --text-medium: #7a6a5a;
+            --text-light: #9a8a7a;
+            --brown: #8b6f47;
+            --brown-dark: #6b4f2f;
+            --brown-light: #c4a67d;
+            --accent-orange: #e8a87c;
+            --accent-coral: #e07a5f;
+            --accent-teal: #81b29a;
+            --border: #d4c4b0;
+            --shadow: rgba(90, 74, 58, 0.1);
+            --radius: 12px;
+            --radius-sm: 8px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Quicksand', sans-serif;
+            background: var(--bg-main);
+            color: var(--text-dark);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* ===== NAVIGATION ===== */
+        .nav-bar {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: linear-gradient(135deg, var(--bg-warm), var(--bg-peach));
+            padding: 12px 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 3px 15px var(--shadow);
+            border-bottom: 3px solid var(--brown-light);
+        }
+
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-family: 'Patrick Hand', cursive;
+            font-size: 1.6rem;
+            color: var(--brown-dark);
+            cursor: default;
+        }
+
+        .nav-logo .chick {
+            font-size: 2rem;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 4px;
+        }
+
+        .nav-tab {
+            padding: 8px 20px;
+            border: none;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.4);
+            color: var(--text-dark);
+            font-family: 'Quicksand', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .nav-tab:hover {
+            background: rgba(255, 255, 255, 0.7);
+            transform: translateY(-1px);
+        }
+
+        .nav-tab.active {
+            background: var(--brown-dark);
+            color: #fff;
+            box-shadow: 0 3px 10px rgba(107, 79, 47, 0.3);
+        }
+
+        .nav-controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .nav-controls select {
+            padding: 6px 14px;
+            border: 2px solid var(--brown-light);
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.6);
+            font-family: 'Quicksand', sans-serif;
+            font-weight: 600;
+            color: var(--text-dark);
+            cursor: pointer;
+            outline: none;
+        }
+
+        /* ===== MAIN CONTAINER ===== */
+        .main-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .page {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ===== MONTHLY PLANNER PAGE ===== */
+        .month-header {
+            background: linear-gradient(135deg, var(--bg-cream), var(--bg-yellow-light));
+            border-radius: var(--radius);
+            padding: 20px 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border: 2px solid var(--border);
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .month-header::before {
+            content: '';
+            position: absolute;
+            top: -20px;
+            right: -20px;
+            width: 150px;
+            height: 150px;
+            background: radial-gradient(circle, var(--bg-yellow) 0%, transparent 70%);
+            opacity: 0.5;
+        }
+
+        .month-title {
+            font-family: 'Patrick Hand', cursive;
+            font-size: 2.2rem;
+            color: var(--brown-dark);
+        }
+
+        .month-info-grid {
+            display: grid;
+            grid-template-columns: auto auto;
+            gap: 4px 15px;
+            background: rgba(255, 255, 255, 0.6);
+            padding: 10px 15px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .month-info-grid .label {
+            color: var(--text-medium);
+        }
+
+        .month-info-grid .value {
+            color: var(--brown-dark);
+            font-weight: 700;
+        }
+
+        /* ===== GRID LAYOUTS ===== */
+        .grid-2col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .grid-3col {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        /* ===== CARD STYLES ===== */
+        .card {
+            background: var(--bg-cream);
+            border-radius: var(--radius);
+            border: 2px solid var(--border);
+            padding: 20px;
+            position: relative;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px var(--shadow);
+        }
+
+        .card-title {
+            font-family: 'Patrick Hand', cursive;
+            font-size: 1.4rem;
+            color: var(--brown-dark);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* ===== GOALS SECTION ===== */
+        .goals-card {
+            background: linear-gradient(135deg, var(--bg-cream), var(--bg-pink-light));
+        }
+
+        .goals-stats {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .donut-container {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            flex-shrink: 0;
+        }
+
+        .donut-container canvas {
+            width: 120px;
+            height: 120px;
+        }
+
+        .donut-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+
+        .donut-percent {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--brown-dark);
+        }
+
+        .goals-counter {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            text-align: center;
+            gap: 8px;
+            font-size: 0.75rem;
+        }
+
+        .goals-counter .num {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--brown-dark);
+        }
+
+        .goals-counter .lbl {
+            color: var(--text-medium);
+            font-weight: 600;
+        }
+
+        .goal-list {
+            list-style: none;
+        }
+
+        .goal-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 12px;
+            margin-bottom: 6px;
+            border-radius: var(--radius-sm);
+            transition: background 0.2s;
+            cursor: pointer;
+        }
+
+        .goal-item:hover {
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        .goal-item input[type="checkbox"] {
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--brown-light);
+            border-radius: 5px;
+            cursor: pointer;
+            flex-shrink: 0;
+            position: relative;
+            background: #fff;
+            transition: all 0.2s;
+        }
+
+        .goal-item input[type="checkbox"]:checked {
+            background: var(--accent-teal);
+            border-color: var(--accent-teal);
+        }
+
+        .goal-item input[type="checkbox"]:checked::after {
+            content: '✓';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #fff;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .goal-item .priority-tag {
+            font-size: 0.65rem;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .priority-tag.high {
+            background: var(--accent-coral);
+            color: #fff;
+        }
+
+        .priority-tag.medium {
+            background: var(--bg-yellow);
+            color: var(--brown-dark);
+        }
+
+        .priority-tag.low {
+            background: var(--bg-blue);
+            color: var(--brown-dark);
+        }
+
+        .goal-item .goal-text {
+            flex: 1;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .goal-item.completed .goal-text {
+            text-decoration: line-through;
+            opacity: 0.5;
+        }
+
+        .add-goal-btn {
+            width: 100%;
+            padding: 8px;
+            border: 2px dashed var(--brown-light);
+            border-radius: var(--radius-sm);
+            background: transparent;
+            color: var(--text-medium);
+            font-family: 'Quicksand', sans-serif;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 8px;
+        }
+
+        .add-goal-btn:hover {
+            background: rgba(255, 255, 255, 0.5);
+            border-color: var(--brown);
+            color: var(--brown-dark);
+        }
+
+        /* ===== BAR CHART ===== */
+        .bar-chart-container {
+            background: linear-gradient(135deg, var(--bg-cream), var(--bg-yellow-light));
+        }
+
+        .bar-chart {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+            height: 180px;
+            padding: 10px 0;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .bar-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            flex: 1;
+        }
+
+        .bar {
+            width: 40px;
+            border-radius: 6px 6px 0 0;
+            transition: height 0.8s ease;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .bar:hover {
+            filter: brightness(1.1);
+        }
+
+        .bar-value {
+            position: absolute;
+            top: -22px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .bar-label {
+            font-size: 0.75rem;
+            color: var(--text-medium);
+            font-weight: 600;
+            margin-top: 5px;
+        }
+
+        /* ===== REFLECTION ===== */
+        .reflection-card {
+            background: linear-gradient(135deg, var(--bg-yellow-light), var(--bg-warm));
+        }
+
+        .reflection-question {
+            margin-bottom: 12px;
+        }
+
+        .reflection-question label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--brown);
+            margin-bottom: 4px;
+        }
+
+        .reflection-question textarea {
+            width: 100%;
+            min-height: 55px;
+            padding: 8px 12px;
+            border: 2px solid var(--border);
+            border-radius: var(--radius-sm);
+            background: rgba(255, 255, 255, 0.6);
+            font-family: 'Quicksand', sans-serif;
+            font-size: 0.85rem;
+            color: var(--text-dark);
+            resize: vertical;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .reflection-question textarea:focus {
+            border-color: var(--brown);
+        }
+
+        /* ===== HABIT TRACKER ===== */
+        .habit-section {
+            background: linear-gradient(135deg, var(--bg-cream), var(--bg-peach));
+            border-radius: var(--radius);
+            border: 2px solid var(--border);
+            padding: 20px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+        }
+
+        .habit-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.8rem;
+        }
+
+        .habit-table th {
+            padding: 6px 4px;
+            text-align: center;
+            font-weight: 700;
+            color: var(--brown-dark);
+            font-size: 0.7rem;
+            position: sticky;
+            top: 0;
+            background: var(--bg-cream);
+        }
+
+        .habit-table th:first-child {
+            text-align: left;
+            min-width: 130px;
+        }
+
+        .habit-table th.pct-col {
+            min-width: 45px;
+        }
+
+        .habit-table td {
+            padding: 4px;
+            text-align: center;
+        }
+
+        .habit-table td:first-child {
+            text-align: left;
+            font-weight: 600;
+            color: var(--text-dark);
+            padding-right: 10px;
+            white-space: nowrap;
+        }
+
+        .habit-cell {
+            width: 24px;
+            height: 24px;
+            border: 2px solid var(--border);
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.6);
+            cursor: pointer;
+            transition: all 0.15s;
+            display: inline-block;
+        }
+
+        .habit-cell:hover {
+            border-color: var(--brown);
+            transform: scale(1.1);
+        }
+
+        .habit-cell.checked {
+            background: var(--accent-coral);
+            border-color: var(--accent-coral);
+        }
+
+        .habit-pct {
+            font-weight: 700;
+            font-size: 0.8rem;
+            color: var(--brown-dark);
+        }
+
+        .add-habit-btn {
+            margin-top: 10px;
+            padding: 6px 16px;
+            border: 2px dashed var(--brown-light);
+            border-radius: 20px;
+            background: transparent;
+            color: var(--text-medium);
+            font-family: 'Quicksand', sans-serif;
+            font-weight: 600;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .add-habit-btn:hover {
+            background: rgba(255, 255, 255, 0.5);
+            border-color: var(--brown);
+        }
+
+        /* ===== WEEKLY PAGE ===== */
+        .week-header {
+            background: linear-gradient(135deg, var(--bg-blue-light), var(--bg-cream));
+            border-radius: var(--radius);
+            border: 2px solid var(--border);
+            padding: 20px;
+            display: grid;
+            grid-template-columns: 200px 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+            align-items: start;
+        }
+
+        .week-title-section {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .week-title {
+            font-family: 'Patrick Hand', cursive;
+            font-size: 2rem;
+            color: var(--brown-dark);
+        }
+
+        .week-goals-section {
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: var(--radius-sm);
+            padding: 12px;
+            border: 1px solid var(--border);
+        }
+
+        .week-goals-section .mini-title {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--brown);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+        }
+
+        .week-goals-list {
+            list-style: none;
+        }
+
+        .week-goal-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 4px 0;
+            font-size: 0.85rem;
+        }
+
+        .week-goal-item input[type="checkbox"] {
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border: 2px solid var(--brown-light);
+            border-radius: 4px;
+            cursor: pointer;
+            background: #fff;
+            flex-shrink: 0;
+            position: relative;
+            transition: all 0.2s;
+        }
+
+        .week-goal-item input[type="checkbox"]:checked {
+            background: var(--accent-teal);
+            border-color: var(--accent-teal);
+        }
+
+        .week-goal-item input[type="checkbox"]:checked::after {
+            content: '✓';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #fff;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .week-reflection {
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: var(--radius-sm);
+            padding: 12px;
+            border: 1px solid var(--border);
+        }
+
+        .week-reflection .mini-title {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--brown-dark);
+            margin-bottom: 8px;
+        }
+
+        .week-reflection textarea {
+            width: 100%;
+            min-height: 40px;
+            padding: 6px 10px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.8);
+            font-family: 'Quicksand', sans-serif;
+            font-size: 0.8rem;
+            color: var(--text-dark);
+            resize: vertical;
+            outline: none;
+            margin-bottom: 4px;
+        }
+
+        /* ===== DAYS GRID ===== */
+        .days-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 6px;
+        }
+
+        .day-card {
+            background: var(--bg-cream);
+            border-radius: var(--radius);
+            border: 2px solid var(--border);
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: flex;
+            flex-direction: column;
+            min-height: 420px;
+        }
+
+        .day-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px var(--shadow);
+        }
+
+        .day-card-header {
+            padding: 6px 10px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .day-card-header .day-name {
+            font-size: 0.85rem;
+        }
+
+        .day-card-header .day-date {
+            font-size: 0.68rem;
+            color: var(--text-medium);
+        }
+
+        /* Colored header per day */
+        .day-card:nth-child(1) .day-card-header {
+            background: #f4c2a1;
+        }
+
+        .day-card:nth-child(2) .day-card-header {
+            background: #e8a87c;
+        }
+
+        .day-card:nth-child(3) .day-card-header {
+            background: #fde9a9;
+        }
+
+        .day-card:nth-child(4) .day-card-header {
+            background: #c5d8a4;
+        }
+
+        .day-card:nth-child(5) .day-card-header {
+            background: #e07a5f;
+            color: #fff;
+        }
+
+        .day-card:nth-child(6) .day-card-header {
+            background: #b8d4e3;
+        }
+
+        .day-card:nth-child(7) .day-card-header {
+            background: #f8d0cb;
+        }
+
+        /* Colored sticky note area at top of card */
+        .day-sticky-area {
+            flex: 1;
+            min-height: 80px;
+            border-bottom: 2px dashed var(--border);
+        }
+
+        .day-card:nth-child(1) .day-sticky-area {
+            background: #fce8da;
+        }
+
+        .day-card:nth-child(2) .day-sticky-area {
+            background: #fce8da;
+        }
+
+        .day-card:nth-child(3) .day-sticky-area {
+            background: #fce8da;
+        }
+
+        .day-card:nth-child(4) .day-sticky-area {
+            background: #fce8da;
+        }
+
+        .day-card:nth-child(5) .day-sticky-area {
+            background: #fce8da;
+        }
+
+        .day-card:nth-child(6) .day-sticky-area {
+            background: #fce8da;
+        }
+
+        .day-card:nth-child(7) .day-sticky-area {
+            background: #fce8da;
+        }
+
+        /* Progress bar below sticky area */
+        .day-progress {
+            padding: 5px 10px;
+            text-align: center;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .day-progress-bar {
+            width: 100%;
+            height: 5px;
+            background: rgba(0, 0, 0, 0.08);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 2px;
+        }
+
+        .day-progress-fill {
+            height: 100%;
+            border-radius: 4px;
+            background: linear-gradient(90deg, var(--accent-coral), var(--accent-orange));
+            transition: width 0.5s ease;
+        }
+
+        .day-progress-text {
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: var(--brown-dark);
+        }
+
+        /* Task section with vertical label on left */
+        .day-tasks-section {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .day-section-row {
+            display: flex;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .day-section-label {
+            writing-mode: vertical-rl;
+            transform: rotate(180deg);
+            font-size: 0.55rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 6px 3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 18px;
+            flex-shrink: 0;
+        }
+
+        .day-section-label.priority {
+            background: rgba(224, 122, 95, 0.25);
+            color: var(--accent-coral);
+        }
+
+        .day-section-label.regular {
+            background: rgba(129, 178, 154, 0.25);
+            color: var(--accent-teal);
+        }
+
+        .day-section-tasks {
+            flex: 1;
+            padding: 4px 6px;
+            min-height: 55px;
+        }
+
+        .day-task-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 2px 0;
+        }
+
+        .day-task-item input[type="checkbox"] {
+            appearance: none;
+            width: 14px;
+            height: 14px;
+            border: 1.5px solid var(--border);
+            border-radius: 3px;
+            cursor: pointer;
+            background: #fff;
+            flex-shrink: 0;
+            position: relative;
+            transition: all 0.2s;
+        }
+
+        .day-task-item input[type="checkbox"]:checked {
+            background: var(--accent-teal);
+            border-color: var(--accent-teal);
+        }
+
+        .day-task-item input[type="checkbox"]:checked::after {
+            content: '✓';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #fff;
+            font-size: 9px;
+            font-weight: 700;
+        }
+
+        .day-task-item .task-text {
+            flex: 1;
+            font-weight: 500;
+            outline: none;
+            border: none;
+            background: transparent;
+            font-family: 'Quicksand', sans-serif;
+            font-size: 0.75rem;
+            color: var(--text-dark);
+            border-bottom: 1px dashed transparent;
+            transition: border-color 0.2s;
+            min-width: 0;
+        }
+
+        .day-task-item .task-text:focus {
+            border-bottom-color: var(--brown-light);
+        }
+
+        .day-task-item.completed .task-text {
+            text-decoration: line-through;
+            opacity: 0.5;
+        }
+
+        /* Note area at bottom */
+        .day-note {
+            border-top: 2px solid var(--bg-yellow);
+        }
+
+        .day-note-label {
+            background: var(--bg-yellow);
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: var(--brown-dark);
+            padding: 2px 8px;
+            text-align: center;
+        }
+
+        .day-note textarea {
+            width: 100%;
+            min-height: 40px;
+            padding: 4px 6px;
+            border: none;
+            background: rgba(255, 255, 255, 0.5);
+            font-family: 'Quicksand', sans-serif;
+            font-size: 0.72rem;
+            color: var(--text-dark);
+            resize: vertical;
+            outline: none;
+            display: block;
+        }
+
+        .add-task-mini {
+            font-size: 0.7rem;
+            padding: 2px 6px;
+            border: 1px dashed var(--border);
+            border-radius: 4px;
+            background: transparent;
+            color: var(--text-light);
+            cursor: pointer;
+            display: block;
+            width: 100%;
+            margin: 3px 0;
+            font-family: 'Quicksand', sans-serif;
+            transition: all 0.2s;
+        }
+
+        .add-task-mini:hover {
+            background: rgba(255, 255, 255, 0.5);
+            color: var(--text-dark);
+            border-color: var(--brown-light);
+        }
+
+        /* ===== MODAL ===== */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        .modal {
+            background: var(--bg-cream);
+            border-radius: var(--radius);
+            border: 2px solid var(--border);
+            padding: 25px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            animation: modalIn 0.3s ease;
+        }
+
+        @keyframes modalIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .modal h3 {
+            font-family: 'Patrick Hand', cursive;
+            font-size: 1.3rem;
+            color: var(--brown-dark);
+            margin-bottom: 15px;
+        }
+
+        .modal input,
+        .modal select {
+            width: 100%;
+            padding: 10px 14px;
+            border: 2px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-family: 'Quicksand', sans-serif;
+            font-size: 0.9rem;
+            color: var(--text-dark);
+            background: #fff;
+            outline: none;
+            margin-bottom: 12px;
+            transition: border-color 0.2s;
+        }
+
+        .modal input:focus,
+        .modal select:focus {
+            border-color: var(--brown);
+        }
+
+        .modal-btns {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .btn {
+            padding: 8px 20px;
+            border: none;
+            border-radius: 20px;
+            font-family: 'Quicksand', sans-serif;
+            font-weight: 700;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--brown-dark);
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            background: var(--brown);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: rgba(0, 0, 0, 0.08);
+            color: var(--text-dark);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(0, 0, 0, 0.15);
+        }
+
+        /* ===== CHICK MASCOT ===== */
+        .mascot {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            font-size: 2.5rem;
+            cursor: pointer;
+            animation: bounce 2s ease infinite;
+            z-index: 50;
+            filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.2));
+            transition: transform 0.2s;
+        }
+
+        .mascot:hover {
+            transform: scale(1.2);
+        }
+
+        @keyframes bounce {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        /* ===== SAVE INDICATOR ===== */
+        .save-indicator {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            padding: 8px 16px;
+            background: var(--accent-teal);
+            color: #fff;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.3s ease;
+            z-index: 50;
+        }
+
+        .save-indicator.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* ===== SCROLLBAR ===== */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-main);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--brown-light);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--brown);
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 1200px) {
+            .days-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        @media (max-width: 900px) {
+
+            .grid-2col,
+            .grid-3col {
+                grid-template-columns: 1fr;
+            }
+
+            .days-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .week-header {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .days-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .nav-bar {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+
+        /* ===== WEEK NAV ===== */
+        .week-nav {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .week-nav-btn {
+            padding: 6px 16px;
+            border: 2px solid var(--border);
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.5);
+            color: var(--text-dark);
+            font-family: 'Quicksand', sans-serif;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .week-nav-btn:hover {
+            background: rgba(255, 255, 255, 0.8);
+        }
+
+        .week-nav-btn.active {
+            background: var(--bg-blue);
+            border-color: var(--bg-blue);
+            color: var(--brown-dark);
+        }
+
+        .chick-icon {
+            display: inline-block;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 20px;
+            color: var(--text-light);
+            font-style: italic;
+        }
+
+        .delete-btn {
+            opacity: 0;
+            background: none;
+            border: none;
+            color: var(--accent-coral);
+            cursor: pointer;
+            font-size: 1rem;
+            transition: opacity 0.2s;
+            padding: 0 4px;
+        }
+
+        .goal-item:hover .delete-btn,
+        .day-task-item:hover .delete-btn {
+            opacity: 1;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <nav class="nav-bar" id="navBar">
+        <div class="nav-logo">
+            <span class="chick">🐥</span>
+            <span>Clarity Planner</span>
+        </div>
+        <div class="nav-tabs">
+            <button class="nav-tab active" data-page="monthly" id="tabMonthly">📅 Tháng</button>
+            <button class="nav-tab" data-page="weekly" id="tabWeekly">📋 Tuần</button>
+        </div>
+        <div class="nav-controls">
+            <select id="monthSelect"></select>
+            <select id="yearSelect"></select>
+        </div>
+    </nav>
+
+    <div class="main-container">
+        <!-- ===== MONTHLY PAGE ===== -->
+        <div class="page active" id="monthlyPage">
+            <!-- Month Header -->
+            <div class="month-header">
+                <div>
+                    <div class="month-title" id="monthTitle">🐥 Kế Hoạch Tháng</div>
+                </div>
+                <div class="month-info-grid">
+                    <span class="label">Tháng</span>
+                    <span class="value" id="infoMonth">1</span>
+                    <span class="label">Năm</span>
+                    <span class="value" id="infoYear">2026</span>
+                    <span class="label">Tuần Hiện Tại</span>
+                    <span class="value" id="infoWeek">-</span>
+                </div>
+            </div>
+
+            <!-- Goals + Chart + Reflection -->
+            <div class="grid-3col">
+                <!-- Goals Card -->
+                <div class="card goals-card">
+                    <div class="card-title">🐥 <span id="monthGoalsTitle">Mục Tiêu Tháng</span></div>
+                    <div class="goals-stats">
+                        <div class="donut-container">
+                            <canvas id="goalsDonut" width="120" height="120"></canvas>
+                            <div class="donut-text">
+                                <div class="donut-percent" id="goalsPercent">0%</div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="goals-counter">
+                                <div>
+                                    <div class="num" id="completedCount">0</div>
+                                    <div class="lbl">Hoàn thành</div>
+                                </div>
+                                <div>
+                                    <div class="num" id="inProgressCount">0</div>
+                                    <div class="lbl">Đang làm</div>
+                                </div>
+                                <div>
+                                    <div class="num" id="totalCount">0</div>
+                                    <div class="lbl">Tổng</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <ul class="goal-list" id="goalList"></ul>
+                    <button class="add-goal-btn" id="addGoalBtn">+ Thêm mục tiêu</button>
+                </div>
+
+                <!-- Weekly Bar Chart -->
+                <div class="card bar-chart-container">
+                    <div class="card-title">📊 Tiến độ tuần</div>
+                    <div class="bar-chart" id="barChart"></div>
+                </div>
+
+                <!-- Reflection -->
+                <div class="card reflection-card">
+                    <div class="card-title">💭 Nhìn Lại</div>
+                    <div class="reflection-question">
+                        <label>Điều gì tôi đã làm tốt và muốn tiếp tục phát huy?</label>
+                        <textarea id="ref1" placeholder="Viết suy nghĩ của bạn..."></textarea>
+                    </div>
+                    <div class="reflection-question">
+                        <label>Bài học quan trọng nhất tôi rút ra được là gì?</label>
+                        <textarea id="ref2" placeholder="Viết suy nghĩ của bạn..."></textarea>
+                    </div>
+                    <div class="reflection-question">
+                        <label>Tôi biết ơn về việc...</label>
+                        <textarea id="ref3" placeholder="Viết suy nghĩ của bạn..."></textarea>
+                    </div>
+                    <div class="reflection-question">
+                        <label>Ba mục tiêu tôi cần tập trung trong tháng tiếp theo là?</label>
+                        <textarea id="ref4" placeholder="Viết suy nghĩ của bạn..."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Habit Tracker -->
+            <div class="habit-section">
+                <div class="card-title">🐔 Theo Dõi Thói Quen</div>
+                <table class="habit-table" id="habitTable">
+                    <thead id="habitHead"></thead>
+                    <tbody id="habitBody"></tbody>
+                </table>
+                <button class="add-habit-btn" id="addHabitBtn">+ Thêm thói quen</button>
+            </div>
+        </div>
+
+        <!-- ===== WEEKLY PAGE ===== -->
+        <div class="page" id="weeklyPage">
+            <div class="week-nav" id="weekNav"></div>
+            <div id="weekContent"></div>
+        </div>
+    </div>
+
+    <!-- Add Goal Modal -->
+    <div class="modal-overlay" id="goalModal">
+        <div class="modal">
+            <h3>🎯 Thêm mục tiêu mới</h3>
+            <input type="text" id="goalInput" placeholder="Nhập mục tiêu..." autofocus>
+            <select id="goalPriority">
+                <option value="high">🔴 Ưu tiên cao</option>
+                <option value="medium">🟡 Ưu tiên trung bình</option>
+                <option value="low">🔵 Ưu tiên thấp</option>
+            </select>
+            <div class="modal-btns">
+                <button class="btn btn-secondary" id="goalCancel">Hủy</button>
+                <button class="btn btn-primary" id="goalSave">Thêm</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Habit Modal -->
+    <div class="modal-overlay" id="habitModal">
+        <div class="modal">
+            <h3>🌟 Thêm thói quen mới</h3>
+            <input type="text" id="habitInput" placeholder="Nhập thói quen (vd: Dậy lúc 5H sáng)..." autofocus>
+            <div class="modal-btns">
+                <button class="btn btn-secondary" id="habitCancel">Hủy</button>
+                <button class="btn btn-primary" id="habitSave">Thêm</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mascot -->
+    <div class="mascot" id="mascot" title="🐥 Cố lên nào!">🐥</div>
+
+    <!-- Save Indicator -->
+    <div class="save-indicator" id="saveIndicator">💾 Đã đồng bộ!</div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-analytics.js";
+        import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAi0zLKToSgvuutf_5Cuva87wgQtdmbEOA",
+            authDomain: "clcl-f098d.firebaseapp.com",
+            databaseURL: "https://clcl-f098d-default-rtdb.firebaseio.com",
+            projectId: "clcl-f098d",
+            storageBucket: "clcl-f098d.firebasestorage.app",
+            messagingSenderId: "854508460315",
+            appId: "1:854508460315:web:bf6afcb35cd7ecf5255bbe",
+            measurementId: "G-H8DNH2M39C"
+        };
+
+        let db = null;
+        try {
+            const app = initializeApp(firebaseConfig);
+            getAnalytics(app);
+            db = getDatabase(app);
+        } catch (e) {
+            console.warn('Firebase khởi tạo thất bại, chạy ở chế độ offline:', e);
+        }
+
+        // ==================== DATA LAYER ====================
+        const MONTH_NAMES_VI = ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6', 'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'];
+        const DAY_NAMES = ['Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7', 'Chủ nhật'];
+        const DAY_EMOJIS = ['🍎', '🍊', '🍋', '🌿', '🍓', '🫐', '🌸'];
+
+        function escapeHtml(str) {
+            if (str == null) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
+        }
+
+        let appData = {};
+        let currentMonth = new Date().getMonth();
+        let currentYear = new Date().getFullYear();
+        let currentWeekIndex = 0;
+
+        function getMonthKey() {
+            return `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}`;
+        }
+
+        function getMonthData() {
+            const key = getMonthKey();
+            if (!appData[key]) {
+                appData[key] = createDefaultMonthData();
+            }
+            return appData[key];
+        }
+
+        function createDefaultMonthData() {
+            // 4 weeks exactly
+            const weeks = [];
+            for (let w = 0; w < 4; w++) {
+                const weekDates = [];
+                for (let d = 0; d < 7; d++) {
+                    weekDates.push(`${w * 7 + d + 1}/${currentMonth + 1}/${currentYear % 100}`);
+                }
+                weeks.push({
+                    dates: weekDates,
+                    weekNum: w + 1,
+                    goals: [],
+                    reflections: { r1: '', r2: '', r3: '', r4: '' },
+                    days: weekDates.map((dateStr, di) => ({
+                        date: dateStr,
+                        priorityTasks: [],
+                        regularTasks: [],
+                        note: ''
+                    }))
+                });
+            }
+
+            return {
+                goals: [],
+                reflections: { ref1: '', ref2: '', ref3: '', ref4: '' },
+                habits: [
+                    { name: 'Dậy lúc 5H sáng', days: {} },
+                    { name: '1h đọc sách', days: {} },
+                    { name: 'Viết 1000 chữ', days: {} },
+                    { name: 'Workout', days: {} },
+                    { name: 'Thiền 1H', days: {} },
+                    { name: 'Viết nhật ký', days: {} }
+                ],
+                weeks: weeks
+            };
+        }
+
+        // Firebase lưu arrays thành objects - cần convert lại
+        function normalizeArr(val) {
+            if (Array.isArray(val)) return val;
+            if (val && typeof val === 'object') {
+                return Object.keys(val)
+                    .sort((a, b) => parseInt(a) - parseInt(b))
+                    .map(k => val[k]);
+            }
+            return [];
+        }
+
+        function normalizeMonthData(md) {
+            if (!md) return md;
+            // normalize weeks
+            md.weeks = normalizeArr(md.weeks);
+            md.weeks.forEach(week => {
+                week.days    = normalizeArr(week.days);
+                week.goals   = normalizeArr(week.goals);
+                week.days.forEach(day => {
+                    day.priorityTasks = normalizeArr(day.priorityTasks);
+                    day.regularTasks  = normalizeArr(day.regularTasks);
+                });
+                if (!week.reflections) week.reflections = { r1:'', r2:'', r3:'', r4:'' };
+                // fill missing days
+                while (week.days.length < 7) {
+                    week.days.push({ date:'', priorityTasks:[], regularTasks:[], note:'' });
+                }
+            });
+            // ensure 4 weeks
+            while (md.weeks.length < 4) {
+                md.weeks.push(createDefaultMonthData().weeks[md.weeks.length] || {
+                    goals:[], reflections:{r1:'',r2:'',r3:'',r4:''},
+                    days: Array(7).fill(null).map(() => ({date:'',priorityTasks:[],regularTasks:[],note:''}))
+                });
+            }
+            if (!md.goals) md.goals = [];
+            else md.goals = normalizeArr(md.goals);
+            if (!md.habits) md.habits = [];
+            else {
+                md.habits = normalizeArr(md.habits);
+                md.habits.forEach(h => { if (!h.days) h.days = {}; });
+            }
+            if (!md.reflections) md.reflections = { ref1:'', ref2:'', ref3:'', ref4:'' };
+            return md;
+        }
+
+        function loadData() {
+            if (!db) return;
+            try {
+                const dbRef = ref(db, 'planner_data');
+                onValue(dbRef, (snapshot) => {
+                    const raw = snapshot.val();
+                    if (raw) {
+                        appData = raw.months ? raw.months : raw;
+                        // Normalize tháng hiện tại
+                        const key = getMonthKey();
+                        if (appData[key]) {
+                            appData[key] = normalizeMonthData(appData[key]);
+                        }
+                        renderAll();
+                    }
+                }, (error) => {
+                    console.error('Firebase read error:', error);
+                });
+            } catch (e) {
+                console.error('Lỗi khi tải DB:', e);
+            }
+        }
+
+        function saveData() {
+            if (!db) return;
+            try {
+                const dbRef = ref(db, 'planner_data');
+                set(dbRef, appData).then(() => {
+                    showSaveIndicator();
+                });
+            } catch (e) {
+                console.error('Firebase save failed:', e);
+            }
+        }
+
+
+
+        function showSaveIndicator() {
+            const el = document.getElementById('saveIndicator');
+            el.classList.add('show');
+            setTimeout(() => el.classList.remove('show'), 1500);
+        }
+
+        let saveTimeout;
+        function debounceSave() {
+            clearTimeout(saveTimeout);
+            saveTimeout = setTimeout(saveData, 500);
+        }
+
+        // ==================== NAVIGATION ====================
+        function initNavigation() {
+            const monthSelect = document.getElementById('monthSelect');
+            const yearSelect = document.getElementById('yearSelect');
+
+            monthSelect.innerHTML = '';
+            yearSelect.innerHTML = '';
+
+            MONTH_NAMES_VI.forEach((name, i) => {
+                const opt = document.createElement('option');
+                opt.value = i;
+                opt.textContent = name;
+                monthSelect.appendChild(opt);
+            });
+            monthSelect.value = currentMonth;
+
+            for (let y = 2024; y <= 2030; y++) {
+                const opt = document.createElement('option');
+                opt.value = y;
+                opt.textContent = y;
+                yearSelect.appendChild(opt);
+            }
+            yearSelect.value = currentYear;
+
+            monthSelect.addEventListener('change', () => {
+                currentMonth = parseInt(monthSelect.value);
+                renderAll();
+            });
+
+            yearSelect.addEventListener('change', () => {
+                currentYear = parseInt(yearSelect.value);
+                renderAll();
+            });
+
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.onclick = () => {
+                    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+                    document.getElementById(tab.dataset.page + 'Page').classList.add('active');
+                    // Re-render khi chuyển tab
+                    if (tab.dataset.page === 'weekly') renderWeekly();
+                    if (tab.dataset.page === 'monthly') renderMonthly();
+                };
+            });
+        }
+
+        // ==================== MONTHLY RENDER ====================
+        function renderMonthly() {
+            const data = getMonthData();
+            const monthName = MONTH_NAMES_VI[currentMonth];
+
+            document.getElementById('monthTitle').textContent = `🐥 Kế Hoạch ${monthName}`;
+            document.getElementById('infoMonth').textContent = currentMonth + 1;
+            document.getElementById('infoYear').textContent = currentYear;
+
+            const now = new Date();
+            if (now.getMonth() === currentMonth && now.getFullYear() === currentYear) {
+                const weekOfMonth = Math.ceil(now.getDate() / 7);
+                document.getElementById('infoWeek').textContent = `Tuần ${Math.min(weekOfMonth, 4)}`;
+            } else {
+                document.getElementById('infoWeek').textContent = '-';
+            }
+
+            document.getElementById('monthGoalsTitle').textContent = `Mục Tiêu ${monthName}`;
+            renderGoals(data);
+            renderBarChart(data);
+
+            document.getElementById('ref1').value = data.reflections.ref1 || '';
+            document.getElementById('ref2').value = data.reflections.ref2 || '';
+            document.getElementById('ref3').value = data.reflections.ref3 || '';
+            document.getElementById('ref4').value = data.reflections.ref4 || '';
+
+            renderHabits(data);
+        }
+
+        function renderGoals(data) {
+            const list = document.getElementById('goalList');
+            list.innerHTML = '';
+
+            const completed = data.goals.filter(g => g.done).length;
+            const total = data.goals.length;
+            const inProgress = total - completed;
+            const pct = total > 0 ? Math.round((completed / total) * 100) : 0;
+
+            document.getElementById('completedCount').textContent = completed;
+            document.getElementById('inProgressCount').textContent = inProgress;
+            document.getElementById('totalCount').textContent = total;
+            document.getElementById('goalsPercent').textContent = pct + '%';
+
+            drawDonut(pct);
+
+            data.goals.forEach((goal, i) => {
+                const li = document.createElement('li');
+                li.className = `goal-item${goal.done ? ' completed' : ''}`;
+                li.innerHTML = `
+            <input type="checkbox" ${goal.done ? 'checked' : ''} data-idx="${i}">
+            <span class="priority-tag ${goal.priority}">${goal.priority === 'high' ? '🔴' : goal.priority === 'medium' ? '🟡' : '🔵'}</span>
+            <span class="goal-text">${escapeHtml(goal.text)}</span>
+            <button class="delete-btn" data-idx="${i}">✕</button>
+        `;
+                list.appendChild(li);
+            });
+
+            list.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+                cb.addEventListener('change', () => {
+                    data.goals[parseInt(cb.dataset.idx)].done = cb.checked;
+                    debounceSave();
+                });
+            });
+
+            list.querySelectorAll('.delete-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    data.goals.splice(parseInt(btn.dataset.idx), 1);
+                    debounceSave();
+                });
+            });
+        }
+
+        function drawDonut(pct) {
+            const canvas = document.getElementById('goalsDonut');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            const size = 120;
+            canvas.width = size * 2;
+            canvas.height = size * 2;
+            ctx.scale(2, 2);
+
+            const cx = size / 2;
+            const cy = size / 2;
+            const radius = 45;
+            const lineWidth = 15;
+
+            ctx.clearRect(0, 0, size, size);
+
+            ctx.beginPath();
+            ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+            ctx.strokeStyle = 'rgba(0,0,0,0.08)';
+            ctx.lineWidth = lineWidth;
+            ctx.stroke();
+
+            if (pct > 0) {
+                const startAngle = -Math.PI / 2;
+                const endAngle = startAngle + (Math.PI * 2 * pct / 100);
+                ctx.beginPath();
+                ctx.arc(cx, cy, radius, startAngle, endAngle);
+                ctx.strokeStyle = '#e8a87c';
+                ctx.lineWidth = lineWidth;
+                ctx.lineCap = 'round';
+                ctx.stroke();
+            }
+        }
+
+        function renderBarChart(data) {
+            const container = document.getElementById('barChart');
+            if (!container) return;
+            container.innerHTML = '';
+
+            const weeks = data.weeks || [];
+            const colors = ['#c4a67d', '#8b6f47', '#e8a87c', '#e07a5f', '#81b29a', '#b8d4e3'];
+
+            weeks.forEach((week, i) => {
+                let totalTasks = 0;
+                let doneTasks = 0;
+                week.days.forEach(day => {
+                    [...(day.priorityTasks || []), ...(day.regularTasks || [])].forEach(t => {
+                        totalTasks++;
+                        if (t.done) doneTasks++;
+                    });
+                });
+                const pct = totalTasks > 0 ? Math.round((doneTasks / totalTasks) * 100) : 0;
+
+                const group = document.createElement('div');
+                group.className = 'bar-group';
+                group.innerHTML = `
+            <div class="bar" style="height: ${Math.max(pct * 1.5, 5)}px; background: ${colors[i % colors.length]};">
+                <span class="bar-value">${pct}%</span>
+            </div>
+            <span class="bar-label">Tuần ${i + 1}</span>
+        `;
+                container.appendChild(group);
+            });
+        }
+
+        function renderHabits(data) {
+            const thead = document.getElementById('habitHead');
+            const tbody = document.getElementById('habitBody');
+
+            // 28 days for exactly 4 weeks
+            const daysInMonth = 28;
+
+            let headerHTML = '<tr><th></th><th class="pct-col">%</th>';
+            for (let d = 1; d <= daysInMonth; d++) {
+                headerHTML += `<th>${d}</th>`;
+            }
+            headerHTML += '</tr>';
+            thead.innerHTML = headerHTML;
+
+            tbody.innerHTML = '';
+            data.habits.forEach((habit, hi) => {
+                const tr = document.createElement('tr');
+
+                let checked = 0;
+                for (let d = 1; d <= daysInMonth; d++) {
+                    if (habit.days[d]) checked++;
+                }
+                const pct = Math.round((checked / daysInMonth) * 100);
+
+                let rowHTML = `<td>${escapeHtml(habit.name)} <button class="delete-btn" data-habit="${hi}" style="opacity:0.3;font-size:0.7rem;">✕</button></td>`;
+                rowHTML += `<td><span class="habit-pct">${pct}%</span></td>`;
+
+                for (let d = 1; d <= daysInMonth; d++) {
+                    const isChecked = habit.days[d] ? 'checked' : '';
+                    rowHTML += `<td><span class="habit-cell ${isChecked}" data-habit="${hi}" data-day="${d}"></span></td>`;
+                }
+
+                tr.innerHTML = rowHTML;
+                tbody.appendChild(tr);
+            });
+
+            tbody.querySelectorAll('.habit-cell').forEach(cell => {
+                cell.onclick = () => {
+                    const hi = parseInt(cell.dataset.habit);
+                    const day = parseInt(cell.dataset.day);
+                    data.habits[hi].days[day] = !data.habits[hi].days[day];
+
+                    // Fast visual update
+                    cell.classList.toggle('checked');
+                    debounceSave();
+                };
+            });
+
+            tbody.querySelectorAll('.delete-btn').forEach(btn => {
+                btn.onclick = (e) => {
+                    e.stopPropagation();
+                    const hi = parseInt(btn.dataset.habit);
+                    if (confirm('Xóa thói quen này?')) {
+                        data.habits.splice(hi, 1);
+                        debounceSave();
+                    }
+                };
+            });
+        }
+
+        // ==================== WEEKLY RENDER ====================
+        function renderWeekly() {
+            const data = getMonthData();
+            const weeks = data.weeks || [];
+
+            const weekNav = document.getElementById('weekNav');
+            weekNav.innerHTML = '';
+            weeks.forEach((w, i) => {
+                const btn = document.createElement('button');
+                btn.className = `week-nav-btn${i === currentWeekIndex ? ' active' : ''}`;
+                btn.textContent = `📅 Tuần ${i + 1}`;
+                btn.onclick = () => {
+                    currentWeekIndex = i;
+                    renderWeekly();
+                };
+                weekNav.appendChild(btn);
+            });
+
+            if (currentWeekIndex >= weeks.length) currentWeekIndex = 0;
+            if (weeks.length === 0) {
+                document.getElementById('weekContent').innerHTML = '<div class="empty-state">Không có dữ liệu tuần</div>';
+                return;
+            }
+
+            const week = weeks[currentWeekIndex];
+
+            // Defensive: normalize week data right here regardless of Firebase format
+            if (!Array.isArray(week.days)) {
+                const obj = week.days || {};
+                week.days = Object.keys(obj).sort((a,b)=>parseInt(a)-parseInt(b)).map(k=>obj[k]);
+            }
+            week.days.forEach(day => {
+                if (!Array.isArray(day.priorityTasks)) {
+                    const o = day.priorityTasks || {};
+                    day.priorityTasks = Object.keys(o).sort((a,b)=>parseInt(a)-parseInt(b)).map(k=>o[k]);
+                }
+                if (!Array.isArray(day.regularTasks)) {
+                    const o = day.regularTasks || {};
+                    day.regularTasks = Object.keys(o).sort((a,b)=>parseInt(a)-parseInt(b)).map(k=>o[k]);
+                }
+            });
+            while (week.days.length < 7) {
+                week.days.push({ date:'', priorityTasks:[], regularTasks:[], note:'' });
+            }
+            if (!Array.isArray(week.goals)) week.goals = [];
+
+            try {
+                renderWeekContent(week, currentWeekIndex, data);
+            } catch(e) {
+                console.error('renderWeekContent error:', e);
+                document.getElementById('weekContent').innerHTML = `<div style="padding:20px;color:red;">Lỗi render: ${e.message}</div>`;
+            }
+        }
+
+        function renderWeekContent(week, weekIdx, monthData) {
+            const container = document.getElementById('weekContent');
+
+            let totalTasks = 0;
+            let doneTasks = 0;
+            week.days.forEach(day => {
+                [...(day.priorityTasks || []), ...(day.regularTasks || [])].forEach(t => {
+                    totalTasks++;
+                    if (t.done) doneTasks++;
+                });
+            });
+            const weekPct = totalTasks > 0 ? Math.round((doneTasks / totalTasks) * 100) : 0;
+
+            const completedGoals = (week.goals || []).filter(g => g.done).length;
+            const totalGoals = (week.goals || []).length;
+            const goalPct = totalGoals > 0 ? Math.round((completedGoals / totalGoals) * 100) : 0;
+
+            let html = `
+        <div class="week-header">
+            <div class="week-title-section">
+                <div style="display:flex;align-items:center;gap:10px;">
+                    <span style="font-size:2.5rem;">🐥</span>
+                    <div>
+                        <div style="font-size:0.8rem;font-weight:700;color:var(--accent-coral);">${goalPct}%</div>
+                        <div class="week-title">Tuần ${weekIdx + 1}</div>
+                    </div>
+                </div>
+                <div class="donut-container" style="width:90px;height:90px;">
+                    <canvas id="weekDonut" width="90" height="90"></canvas>
+                    <div class="donut-text">
+                        <div class="donut-percent" style="font-size:1.1rem;">${goalPct}%</div>
+                    </div>
+                </div>
+                <div class="goals-counter" style="font-size:0.7rem;">
+                    <div><div class="num" style="font-size:1rem;">${completedGoals}</div><div class="lbl">Hoàn thành</div></div>
+                    <div><div class="num" style="font-size:1rem;">${totalGoals - completedGoals}</div><div class="lbl">Đang làm</div></div>
+                    <div><div class="num" style="font-size:1rem;">${totalGoals}</div><div class="lbl">Tổng cộng</div></div>
+                </div>
+            </div>
+
+            <div class="week-goals-section">
+                <div class="mini-title">🎯 Mục Tiêu Tuần</div>
+                <ul class="week-goals-list" id="weekGoalsList">
+    `;
+
+            (week.goals || []).forEach((g, gi) => {
+                const priorityClass = g.priority === 'high' ? 'priority' : 'regular';
+                const priorityText = g.priority === 'high' ? 'Ưu tiên' : 'Thường';
+                html += `
+            <li class="week-goal-item">
+                <input type="checkbox" ${g.done ? 'checked' : ''} data-week="${weekIdx}" data-gidx="${gi}">
+                <span class="day-section-label ${priorityClass}" style="margin:0;padding:2px 6px;font-size:0.6rem;">${priorityText}</span>
+                <span>${escapeHtml(g.text)}</span>
+                <button class="delete-btn" data-week="${weekIdx}" data-gidx="${gi}" style="opacity:0.3;">✕</button>
+            </li>
+        `;
+            });
+
+            html += `
+                </ul>
+                <button class="add-task-mini" id="addWeekGoalBtn" style="margin-top:6px;">+ Thêm mục tiêu tuần</button>
+            </div>
+
+            <div class="week-reflection">
+                <div class="mini-title">💭 Nhìn Lại</div>
+                <div class="reflection-question">
+                    <label style="font-size:0.7rem;">Điều gì tôi đã làm tốt và muốn tiếp tục phát huy?</label>
+                    <textarea class="week-ref" data-week="${weekIdx}" data-ref="r1" style="min-height:35px;">${escapeHtml(week.reflections?.r1 || '')}</textarea>
+                </div>
+                <div class="reflection-question">
+                    <label style="font-size:0.7rem;">Bài học quan trọng nhất tôi rút ra được là gì?</label>
+                    <textarea class="week-ref" data-week="${weekIdx}" data-ref="r2" style="min-height:35px;">${escapeHtml(week.reflections?.r2 || '')}</textarea>
+                </div>
+                <div class="reflection-question">
+                    <label style="font-size:0.7rem;">Tôi biết ơn về việc...</label>
+                    <textarea class="week-ref" data-week="${weekIdx}" data-ref="r3" style="min-height:35px;">${escapeHtml(week.reflections?.r3 || '')}</textarea>
+                </div>
+                <div class="reflection-question">
+                    <label style="font-size:0.7rem;">Ba mục tiêu tôi cần tập trung trong tuần tiếp theo là?</label>
+                    <textarea class="week-ref" data-week="${weekIdx}" data-ref="r4" style="min-height:35px;">${escapeHtml(week.reflections?.r4 || '')}</textarea>
+                </div>
+            </div>
+        </div>
+
+        <div style="text-align:center;margin-bottom:15px;">
+            <span style="font-family:'Patrick Hand',cursive;font-size:1.5rem;color:var(--brown-dark);">🌿 Mục Tiêu & Nhiệm Vụ Tuần 🌿</span>
+        </div>
+
+        <div class="days-grid">
+    `;
+
+            week.days.forEach((day, di) => {
+                const dayPriorityTasks = day.priorityTasks || [];
+                const dayRegularTasks = day.regularTasks || [];
+                const allTasks = [...dayPriorityTasks, ...dayRegularTasks];
+                const dayDone = allTasks.filter(t => t.done).length;
+                const dayTotal = allTasks.length;
+                const dayPct = dayTotal > 0 ? Math.round((dayDone / dayTotal) * 100) : 0;
+
+                html += `
+            <div class="day-card">
+                <div class="day-card-header">
+                    <span class="day-name">${DAY_EMOJIS[di]} ${DAY_NAMES[di]}</span>
+                    <span class="day-date">${day.date || ''}</span>
+                </div>
+
+                <div class="day-sticky-area"></div>
+
+                <div class="day-progress">
+                    <div class="day-progress-bar">
+                        <div class="day-progress-fill" style="width: ${dayPct}%;"></div>
+                    </div>
+                    <span class="day-progress-text">${dayPct}%</span>
+                </div>
+
+                <div class="day-tasks-section">
+                    <div class="day-section-row">
+                        <div class="day-section-label priority">Priority</div>
+                        <div class="day-section-tasks">
+        `;
+
+                dayPriorityTasks.forEach((task, ti) => {
+                    html += `
+                            <div class="day-task-item ${task.done ? 'completed' : ''}">
+                                <input type="checkbox" ${task.done ? 'checked' : ''}
+                                    data-week="${weekIdx}" data-day="${di}" data-type="priority" data-tidx="${ti}">
+                                <input type="text" class="task-text" value="${escapeHtml(task.text)}"
+                                    data-week="${weekIdx}" data-day="${di}" data-type="priority" data-tidx="${ti}">
+                                <button class="delete-btn" data-week="${weekIdx}" data-day="${di}" data-type="priority" data-tidx="${ti}">✕</button>
+                            </div>
+            `;
+                });
+
+                html += `
+                        </div>
+                    </div>
+                    <button class="add-task-mini" data-week="${weekIdx}" data-day="${di}" data-type="priority">+ thêm</button>
+
+                    <div class="day-section-row">
+                        <div class="day-section-label regular">Regular</div>
+                        <div class="day-section-tasks">
+        `;
+
+                dayRegularTasks.forEach((task, ti) => {
+                    html += `
+                            <div class="day-task-item ${task.done ? 'completed' : ''}">
+                                <input type="checkbox" ${task.done ? 'checked' : ''}
+                                    data-week="${weekIdx}" data-day="${di}" data-type="regular" data-tidx="${ti}">
+                                <input type="text" class="task-text" value="${escapeHtml(task.text)}"
+                                    data-week="${weekIdx}" data-day="${di}" data-type="regular" data-tidx="${ti}">
+                                <button class="delete-btn" data-week="${weekIdx}" data-day="${di}" data-type="regular" data-tidx="${ti}">✕</button>
+                            </div>
+            `;
+                });
+
+                html += `
+                        </div>
+                    </div>
+                    <button class="add-task-mini" data-week="${weekIdx}" data-day="${di}" data-type="regular">+ thêm</button>
+                </div>
+
+                <div class="day-note">
+                    <div class="day-note-label">📝 Ghi chú</div>
+                    <textarea class="day-note-text" data-week="${weekIdx}" data-day="${di}" placeholder="Ghi chú...">${escapeHtml(day.note || '')}</textarea>
+                </div>
+            </div>
+        `;
+            });
+
+            html += '</div>';
+            container.innerHTML = html;
+
+            setTimeout(() => {
+                drawWeekDonut(goalPct);
+            }, 50);
+
+            attachWeeklyEvents(monthData);
+        }
+
+        function drawWeekDonut(pct) {
+            const canvas = document.getElementById('weekDonut');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            const size = 90;
+            canvas.width = size * 2;
+            canvas.height = size * 2;
+            ctx.scale(2, 2);
+
+            const cx = size / 2;
+            const cy = size / 2;
+            const radius = 33;
+            const lineWidth = 12;
+
+            ctx.clearRect(0, 0, size, size);
+
+            ctx.beginPath();
+            ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+            ctx.strokeStyle = 'rgba(0,0,0,0.08)';
+            ctx.lineWidth = lineWidth;
+            ctx.stroke();
+
+            if (pct > 0) {
+                const startAngle = -Math.PI / 2;
+                const endAngle = startAngle + (Math.PI * 2 * pct / 100);
+                ctx.beginPath();
+                ctx.arc(cx, cy, radius, startAngle, endAngle);
+                ctx.strokeStyle = '#e8a87c';
+                ctx.lineWidth = lineWidth;
+                ctx.lineCap = 'round';
+                ctx.stroke();
+            }
+        }
+
+        function attachWeeklyEvents(monthData) {
+            const data = monthData;
+
+            document.querySelectorAll('#weekGoalsList input[type="checkbox"]').forEach(cb => {
+                cb.onchange = () => {
+                    const wi = parseInt(cb.dataset.week);
+                    const gi = parseInt(cb.dataset.gidx);
+                    data.weeks[wi].goals[gi].done = cb.checked;
+                    debounceSave();
+                    renderWeekly();
+                };
+            });
+
+            document.querySelectorAll('#weekGoalsList .delete-btn').forEach(btn => {
+                btn.onclick = () => {
+                    const wi = parseInt(btn.dataset.week);
+                    const gi = parseInt(btn.dataset.gidx);
+                    data.weeks[wi].goals.splice(gi, 1);
+                    debounceSave();
+                    renderWeekly();
+                };
+            });
+
+            const addWeekGoalBtn = document.getElementById('addWeekGoalBtn');
+            if (addWeekGoalBtn) {
+                addWeekGoalBtn.onclick = () => {
+                    const text = prompt('Nhập mục tiêu tuần:');
+                    if (text && text.trim()) {
+                        const priority = confirm('Đây có phải mục tiêu ưu tiên không?') ? 'high' : 'low';
+                        data.weeks[currentWeekIndex].goals.push({ text: text.trim(), done: false, priority });
+                        debounceSave();
+                        renderWeekly();
+                    }
+                };
+            }
+
+            document.querySelectorAll('.week-ref').forEach(ta => {
+                ta.onchange = () => {
+                    const wi = parseInt(ta.dataset.week);
+                    const ref = ta.dataset.ref;
+                    if (!data.weeks[wi].reflections) data.weeks[wi].reflections = {};
+                    data.weeks[wi].reflections[ref] = ta.value;
+                    debounceSave();
+                };
+            });
+
+            document.querySelectorAll('.day-task-item input[type="checkbox"]').forEach(cb => {
+                cb.onchange = () => {
+                    const wi = parseInt(cb.dataset.week);
+                    const di = parseInt(cb.dataset.day);
+                    const type = cb.dataset.type;
+                    const ti = parseInt(cb.dataset.tidx);
+                    const tasks = type === 'priority' ? data.weeks[wi].days[di].priorityTasks : data.weeks[wi].days[di].regularTasks;
+                    tasks[ti].done = cb.checked;
+                    debounceSave();
+                    renderWeekly();
+                };
+            });
+
+            document.querySelectorAll('.day-task-item .task-text').forEach(input => {
+                input.onchange = () => {
+                    const wi = parseInt(input.dataset.week);
+                    const di = parseInt(input.dataset.day);
+                    const type = input.dataset.type;
+                    const ti = parseInt(input.dataset.tidx);
+                    const tasks = type === 'priority' ? data.weeks[wi].days[di].priorityTasks : data.weeks[wi].days[di].regularTasks;
+                    tasks[ti].text = input.value;
+                    debounceSave();
+                };
+            });
+
+            document.querySelectorAll('.day-task-item .delete-btn').forEach(btn => {
+                btn.onclick = () => {
+                    const wi = parseInt(btn.dataset.week);
+                    const di = parseInt(btn.dataset.day);
+                    const type = btn.dataset.type;
+                    const ti = parseInt(btn.dataset.tidx);
+                    const tasks = type === 'priority' ? data.weeks[wi].days[di].priorityTasks : data.weeks[wi].days[di].regularTasks;
+                    tasks.splice(ti, 1);
+                    debounceSave();
+                    renderWeekly();
+                };
+            });
+
+            document.querySelectorAll('.add-task-mini').forEach(btn => {
+                if (btn.id === 'addWeekGoalBtn') return;
+                btn.onclick = () => {
+                    const wi = parseInt(btn.dataset.week);
+                    const di = parseInt(btn.dataset.day);
+                    const type = btn.dataset.type;
+                    if (isNaN(wi) || isNaN(di)) return;
+                    const tasks = type === 'priority' ? data.weeks[wi].days[di].priorityTasks : data.weeks[wi].days[di].regularTasks;
+                    tasks.push({ text: 'Nhiệm vụ mới', done: false });
+                    debounceSave();
+                    renderWeekly();
+                };
+            });
+
+            document.querySelectorAll('.day-note-text').forEach(ta => {
+                ta.onchange = () => {
+                    const wi = parseInt(ta.dataset.week);
+                    const di = parseInt(ta.dataset.day);
+                    data.weeks[wi].days[di].note = ta.value;
+                    debounceSave();
+                };
+            });
+        }
+
+        // ==================== MODALS ====================
+        function initModals() {
+            const data = () => getMonthData();
+
+            document.getElementById('addGoalBtn').onclick = () => {
+                document.getElementById('goalModal').classList.add('show');
+                document.getElementById('goalInput').value = '';
+                setTimeout(() => document.getElementById('goalInput').focus(), 100);
+            };
+
+            document.getElementById('goalCancel').onclick = () => {
+                document.getElementById('goalModal').classList.remove('show');
+            };
+
+            document.getElementById('goalSave').onclick = () => {
+                const text = document.getElementById('goalInput').value.trim();
+                const priority = document.getElementById('goalPriority').value;
+                if (text) {
+                    data().goals.push({ text, priority, done: false });
+                    debounceSave();
+                    renderMonthly();
+                }
+                document.getElementById('goalModal').classList.remove('show');
+            };
+
+            document.getElementById('goalInput').onkeypress = (e) => {
+                if (e.key === 'Enter') document.getElementById('goalSave').click();
+            };
+
+            document.getElementById('addHabitBtn').onclick = () => {
+                document.getElementById('habitModal').classList.add('show');
+                document.getElementById('habitInput').value = '';
+                setTimeout(() => document.getElementById('habitInput').focus(), 100);
+            };
+
+            document.getElementById('habitCancel').onclick = () => {
+                document.getElementById('habitModal').classList.remove('show');
+            };
+
+            document.getElementById('habitSave').onclick = () => {
+                const text = document.getElementById('habitInput').value.trim();
+                if (text) {
+                    data().habits.push({ name: text, days: {} });
+                    debounceSave();
+                    renderMonthly();
+                }
+                document.getElementById('habitModal').classList.remove('show');
+            };
+
+            document.getElementById('habitInput').onkeypress = (e) => {
+                if (e.key === 'Enter') document.getElementById('habitSave').click();
+            };
+
+            document.querySelectorAll('.modal-overlay').forEach(overlay => {
+                overlay.onclick = (e) => {
+                    if (e.target === overlay) overlay.classList.remove('show');
+                };
+            });
+        }
+
+        // ==================== REFLECTIONS ====================
+        function initReflections() {
+            ['ref1', 'ref2', 'ref3', 'ref4'].forEach(id => {
+                document.getElementById(id).onchange = (e) => {
+                    const data = getMonthData();
+                    data.reflections[id] = e.target.value;
+                    debounceSave();
+                };
+            });
+        }
+
+        // ==================== MASCOT ====================
+        function initMascot() {
+            const mascotMessages = [
+                '🐥 Cố lên nào! Bạn làm tốt lắm!',
+                '🐥 Mỗi bước nhỏ đều đưa bạn đến gần mục tiêu!',
+                '🐥 Hôm nay bạn đã hoàn thành bao nhiêu việc rồi?',
+                '🐥 Đừng quên uống nước nhé!',
+                '🐥 Nghỉ ngơi cũng là một phần của năng suất!',
+                '🐥 Bạn thật tuyệt vời! Tiếp tục phát huy!',
+                '🐥 Chiến thôi! Đỉnh cao đang đợi bạn!',
+            ];
+
+            document.getElementById('mascot').onclick = () => {
+                const msg = mascotMessages[Math.floor(Math.random() * mascotMessages.length)];
+                alert(msg);
+            };
+        }
+
+        // ==================== RENDER ALL ====================
+        function renderAll() {
+            renderMonthly();
+            renderWeekly();
+        }
+
+        // ==================== INIT ====================
+        document.addEventListener('DOMContentLoaded', () => {
+            initNavigation();
+            initModals();
+            initReflections();
+            initMascot();
+            renderAll();
+
+            // Tải Firebase ngầm sau khi giao diện đã được render xong
+            loadData();
+        });
+    </script>
+
+</body>
+
+</html>
