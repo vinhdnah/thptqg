@@ -2304,7 +2304,7 @@
             }
 
             document.querySelectorAll('.week-ref').forEach(ta => {
-                ta.onchange = () => {
+                ta.oninput = () => {
                     const wi = parseInt(ta.dataset.week);
                     const ref = ta.dataset.ref;
                     if (!data.weeks[wi].reflections) data.weeks[wi].reflections = {};
@@ -2327,13 +2327,22 @@
             });
 
             document.querySelectorAll('.day-task-item .task-text').forEach(input => {
-                input.onchange = () => {
+                input.oninput = () => {
                     const wi = parseInt(input.dataset.week);
                     const di = parseInt(input.dataset.day);
                     const type = input.dataset.type;
                     const ti = parseInt(input.dataset.tidx);
                     const tasks = type === 'priority' ? data.weeks[wi].days[di].priorityTasks : data.weeks[wi].days[di].regularTasks;
                     tasks[ti].text = input.value;
+                    debounceSave();
+                };
+            });
+
+            document.querySelectorAll('.day-note-text').forEach(ta => {
+                ta.oninput = () => {
+                    const wi = parseInt(ta.dataset.week);
+                    const di = parseInt(ta.dataset.day);
+                    data.weeks[wi].days[di].note = ta.value;
                     debounceSave();
                 };
             });
@@ -2366,7 +2375,7 @@
             });
 
             document.querySelectorAll('.day-note-text').forEach(ta => {
-                ta.onchange = () => {
+                ta.oninput = () => {
                     const wi = parseInt(ta.dataset.week);
                     const di = parseInt(ta.dataset.day);
                     data.weeks[wi].days[di].note = ta.value;
@@ -2438,7 +2447,7 @@
         // ==================== REFLECTIONS ====================
         function initReflections() {
             ['ref1', 'ref2', 'ref3', 'ref4'].forEach(id => {
-                document.getElementById(id).onchange = (e) => {
+                document.getElementById(id).oninput = (e) => {
                     const data = getMonthData();
                     data.reflections[id] = e.target.value;
                     debounceSave();
